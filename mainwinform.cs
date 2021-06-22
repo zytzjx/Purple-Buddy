@@ -26,7 +26,10 @@ namespace Prizrak
         AppleDevices apple_device_mods = new AppleDevices();
 
 
-        private struct NORMAL_MODE_IDEVICE_INFO     //      Usage: update_listview_normal_mode_idevices(arg)
+        /// <summary>
+        /// Holds primitive information for each device on connection. <see cref="update_listview_normal_mode_idevices(iDeviceHandle)">
+        /// </summary>
+        private struct NORMAL_MODE_IDEVICE_INFO
         {
             public string model;
             public ulong  capacity;
@@ -37,19 +40,48 @@ namespace Prizrak
             public string[] data;
         }
 
+        /// <summary>
+        /// <see cref="get_device_count">
+        /// </summary>
+        private struct DEVICE_COUNT
+        {
+            public ReadOnlyCollection<string> udids;
+            public int count;
+        }
 
+        /// <summary>
+        /// Updates UI lable with currently connected device count. <see cref="toolstrip_connected_devices_lable"/>
+        /// </summary>
+        private void get_device_count()
+        {
+
+            while (true)
+            {
+                DEVICE_COUNT structure = new DEVICE_COUNT();
+
+                structure.count = 0;
+
+                var idevice = LibiMobileDevice.Instance.iDevice;
+                var lockdown = LibiMobileDevice.Instance.Lockdown;
+                var ret = idevice.idevice_get_device_list(out structure.udids, ref structure.count);
+
+
+                change_via_thread.ControlInvoke(connected_normal_mode_devices_listview, () => toolstrip_connected_devices_lable.Text = "NMM: " + structure.count.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Fills listview with primitive information of newly connected iOS device which handle is passed by - > <see cref="toolstrip_connected_devices_lable_TextChanged_1(object, EventArgs)"/>
+        /// </summary>
+        /// <param name="device_handle">handle of the device passed.</param>
         private void update_listview_normal_mode_idevices(iDeviceHandle device_handle)
         {
             NORMAL_MODE_IDEVICE_INFO normal_info = new NORMAL_MODE_IDEVICE_INFO();
             normal_info.data = new string[5];
 
-
             var lockdown = LibiMobileDevice.Instance.Lockdown;
             LockdownClientHandle lockdowndevice;
             lockdown.lockdownd_client_new_with_handshake(device_handle, out lockdowndevice, "Ghost");
-
-
-
 
             try
             {
@@ -81,7 +113,6 @@ namespace Prizrak
                     }
                 }
             }          
-
 
 
             try
@@ -203,36 +234,9 @@ namespace Prizrak
         }
 
 
+        
 
-
-
-
-        private struct DEVICE_COUNT
-        {
-
-            public ReadOnlyCollection<string> udids;
-            public int count;
-            
-        }
-
-        private Task<int> get_device_count()
-        {
-
-            while (true)
-            {
-                DEVICE_COUNT structure = new DEVICE_COUNT();
-
-                structure.count = 0;
-
-                var idevice  = LibiMobileDevice.Instance.iDevice;
-                var lockdown = LibiMobileDevice.Instance.Lockdown;
-                var ret      = idevice.idevice_get_device_list(out structure.udids, ref structure.count);
-                
-
-                change_via_thread.ControlInvoke(connected_normal_mode_devices_listview, () => toolstrip_connected_devices_lable.Text = "NMM: "+ structure.count.ToString());
-                Thread.Sleep(260);
-            }         
-        }
+        
 
 
         
