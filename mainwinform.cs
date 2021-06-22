@@ -207,16 +207,6 @@ namespace Prizrak
                 normal_info.data[4] = normal_info.iccid;
 
 
-
-            
-            
-
-            
-
-
-
-
-
             normal_info.item = new ListViewItem(normal_info.data);
 
             try
@@ -232,16 +222,6 @@ namespace Prizrak
                 return;
             }
         }
-
-
-        
-
-        
-
-
-        
-        
-
 
 
 
