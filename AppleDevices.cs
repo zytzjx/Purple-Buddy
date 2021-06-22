@@ -1,14 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Prizrak
 {
     class AppleDevices
     {
-        public Dictionary<string, string> devices_iphones = new Dictionary<string, string>()
+
+
+        /// <summary>
+        /// Iphone color codes.
+        /// </summary>
+        public readonly Dictionary<string, string> devices_iphone_colors = new Dictionary<string, string>()
+        {
+            { "1" , "Black" },
+            { "2" , "Silver" },
+            { "3" , "Gold" },
+            { "4" , "Rose Gold" },
+            { "5" , "Jet Black" },
+            { "6" , "Red" },
+        };
+
+
+        /// <summary>
+        /// iPhone ProductCode(s) with matching model type.
+        /// </summary>
+        public readonly Dictionary<string, string> devices_iphones = new Dictionary<string, string>()
         {
             { "iPhone1,1" , "iPhone" },
             { "iPhone1,2" , "iPhone 3G" },
@@ -51,5 +67,8 @@ namespace Prizrak
             { "iPhone13,3" , "iPhone 12 Pro" },
             { "iPhone13,4" , "iPhone 12 Pro Max" },
         };
+
+        
+
     }
 }

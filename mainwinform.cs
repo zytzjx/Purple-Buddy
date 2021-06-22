@@ -22,19 +22,18 @@ namespace Prizrak
         }
 
 
-        iosbasicessentials basic_ios_essentials = new iosbasicessentials();
+        iMobileNormalCommands basic_ios_essentials = new iMobileNormalCommands();
         AppleDevices apple_device_mods = new AppleDevices();
 
 
-        private struct NORMAL_MODE_IDEVICE_INFO     //      Only usage: update_listview_normal_mode_idevices(arg)
+        private struct NORMAL_MODE_IDEVICE_INFO     //      Usage: update_listview_normal_mode_idevices(arg)
         {
             public string model;
             public ulong  capacity;
             public string udid;
             public string imei;
-            public string iccid;
-            
-            public ListViewItem item;
+            public string iccid;                  
+            public ListViewItem item;           
             public string[] data;
         }
 
@@ -46,15 +45,18 @@ namespace Prizrak
 
 
             var lockdown = LibiMobileDevice.Instance.Lockdown;
-            LockdownClientHandle lockdowndevice;         
-            lockdown.lockdownd_client_new_with_handshake(device_handle, out lockdowndevice, "Ghost").ThrowOnError();
+            LockdownClientHandle lockdowndevice;
+            lockdown.lockdownd_client_new_with_handshake(device_handle, out lockdowndevice, "Ghost");
+
 
 
 
             try
             {
-                lockdown.lockdownd_get_value(lockdowndevice, null, "ProductType", out var model).ThrowOnError();
-                LibiMobileDevice.Instance.Plist.plist_get_string_val(model, out normal_info.model);              
+
+                lockdown.lockdownd_get_value(lockdowndevice, null, "ProductType", out var model);
+                LibiMobileDevice.Instance.Plist.plist_get_string_val(model, out normal_info.model); 
+                
             }
             catch (Exception)
             {
@@ -72,8 +74,10 @@ namespace Prizrak
                 {
                     if (normal_info.model == iphone_make.Key)
                     {
+
                         normal_info.data[0] = iphone_make.Value;
                         break;
+
                     }
                 }
             }          
@@ -82,8 +86,10 @@ namespace Prizrak
 
             try
             {
+
                 lockdown.lockdownd_get_value(lockdowndevice, "com.apple.disk_usage.factory", "TotalDiskCapacity", out var storage);
-                LibiMobileDevice.Instance.Plist.plist_get_uint_val(storage, ref normal_info.capacity);                               
+                LibiMobileDevice.Instance.Plist.plist_get_uint_val(storage, ref normal_info.capacity);      
+                
             }
             catch (Exception)
             {
@@ -92,8 +98,10 @@ namespace Prizrak
 
 
             if (normal_info.capacity == 0)
-            {              
+            {         
+                
                 normal_info.data[1] = "N/A"; 
+
             }
 
             else
@@ -104,7 +112,9 @@ namespace Prizrak
 
             try
             {
-                lockdown.lockdownd_get_device_udid(lockdowndevice, out normal_info.udid);                
+
+                lockdown.lockdownd_get_device_udid(lockdowndevice, out normal_info.udid);   
+                
             }
             catch (Exception)
             {
@@ -124,8 +134,10 @@ namespace Prizrak
 
             try
             {
+
                 lockdown.lockdownd_get_value(lockdowndevice, null, "InternationalMobileEquipmentIdentity", out var d_imei).ThrowOnError();
-                LibiMobileDevice.Instance.Plist.plist_get_string_val(d_imei, out normal_info.imei);               
+                LibiMobileDevice.Instance.Plist.plist_get_string_val(d_imei, out normal_info.imei);  
+                
             }
             catch (Exception)
             {
@@ -145,9 +157,10 @@ namespace Prizrak
 
             try
             {
+
                 lockdown.lockdownd_get_value(lockdowndevice, null, "IntegratedCircuitCardIdentity", out var iccid).ThrowOnError();
-                LibiMobileDevice.Instance.Plist.plist_get_string_val(iccid, out normal_info.iccid);
-                
+                LibiMobileDevice.Instance.Plist.plist_get_string_val(iccid, out normal_info.iccid);              
+
             }
             catch (Exception)
             {
@@ -163,13 +176,25 @@ namespace Prizrak
                 normal_info.data[4] = normal_info.iccid;
 
 
+
+            
+            
+
+            
+
+
+
+
+
             normal_info.item = new ListViewItem(normal_info.data);
 
             try
             {
+
                 change_via_thread.ControlInvoke(connected_normal_mode_devices_listview, () => connected_normal_mode_devices_listview.BeginUpdate());
                 change_via_thread.ControlInvoke(connected_normal_mode_devices_listview, () => connected_normal_mode_devices_listview.Items.Add(normal_info.item));
                 change_via_thread.ControlInvoke(connected_normal_mode_devices_listview, () => connected_normal_mode_devices_listview.EndUpdate());
+
             }
             catch (Exception)
             {
@@ -190,7 +215,7 @@ namespace Prizrak
             
         }
 
-        private void get_device_count()
+        private Task<int> get_device_count()
         {
 
             while (true)
@@ -232,16 +257,13 @@ namespace Prizrak
             connected_normal_mode_devices_listview.Columns.Add("UDID", 180);
             connected_normal_mode_devices_listview.Columns.Add("IMEI", 150);
             connected_normal_mode_devices_listview.Columns.Add("ICCID", 70);
-                                    
+            //connected_normal_mode_devices_listview.Columns.Add("Setup Wizard Completed", 170);
+
 
             essentials.form_load_tasks    = new Task[1];
             essentials.form_load_tasks[0] = Task.Run(() => { get_device_count(); });
+            
         }
-
-        
-
-
-
 
         
 
@@ -308,17 +330,12 @@ namespace Prizrak
                 iDeviceHandle device_handle = null;
                 idevice.idevice_new(out device_handle, device_id);
 
-                Thread t_enter_recovery_iosdevices = new Thread(() => basic_ios_essentials.recovery_enterrecoverymode(device_handle));
+                Thread t_enter_recovery_iosdevices = new Thread(() => basic_ios_essentials.mass_recovery_enterrecoverymode(device_handle));
                 t_enter_recovery_iosdevices.Start();
             }
         }
 
-        private void toolstrip_exit_recovery_devices_button_Click_1(object sender, EventArgs e)
-        {
-            Thread t_exit_recovery_iosdevices = new Thread(() => basic_ios_essentials.recovery_exitrecoverymode());
-            t_exit_recovery_iosdevices.Start();
-        }
-
+        
         private void toolstrip_connected_devices_lable_TextChanged_1(object sender, EventArgs e)
         {
             connected_normal_mode_devices_listview.Items.Clear();
@@ -330,13 +347,14 @@ namespace Prizrak
             var idevice = LibiMobileDevice.Instance.iDevice;
             var result  = idevice.idevice_get_device_list(out udids, ref count);
 
+            
 
             foreach (var device_id in udids)
             {
                 iDeviceHandle device_handle = null;
                 idevice.idevice_new(out device_handle, device_id);
 
-                Thread t_update_normal_info = new Thread(() => update_listview_normal_mode_idevices(device_handle));
+                Thread t_update_normal_info = new Thread(() => update_listview_normal_mode_idevices(device_handle));               
                 t_update_normal_info.Start();
             }
         }
