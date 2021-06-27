@@ -1,3 +1,4 @@
 # Purple-Buddy
-WIP = Work In Progress
-JFF = Just For Fun
+Work In Progress
+
+If anyone would like to work together or have questions, contact me on Discord. ( WilliamHottzz#8218 )
